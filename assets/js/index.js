@@ -142,3 +142,21 @@ function getWeather(cityName) {
     });
   });
 }
+
+$("#add-city").on("click", function (event) {
+    event.preventDefault();
+  
+    var city = $("#city-input").val().trim();
+  
+    if (city === "") {
+      return;
+    }
+    cities.push(city);
+    storedCity();
+    showCity();
+  });
+  
+  $(document).on("click", "#listC", function () {
+    var thisCity = $(this).attr("data-city");
+    getWeather(thisCity);
+  });
