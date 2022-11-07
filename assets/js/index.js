@@ -4,7 +4,6 @@ var apiKey = "fc8bffadcdca6a94d021c093eac22797";
 
 function formatDay(date) {
   var date = new Date();
-  console.log(date);
   var month = date.getMonth() + 1;
   var day = date.getDate();
 
@@ -21,16 +20,15 @@ function formatDay(date) {
 
 start();
 function start() {
-  var storeCity = JSON.parse(localStorage.getItem("cities"));
-
-  if (storeCity !== null) {
-    cities = storeCity;
+  var storedCities = JSON.parse(localStorage.getItem("cities"));
+  if (storedCities !== null) {
+    cities = storedCities;
   }
   showCity();
 }
 
-function storedCity() {
-  localStorage.setItem("city", JSON.stringify(city));
+function saveCity() {
+  localStorage.setItem("cities", JSON.stringify(cities));
 }
 
 function showCity() {
@@ -66,8 +64,10 @@ function getWeather(cityName) {
   }).then(function (response) {
     cityTitle = $("<h3>").text(response.name + " " + formatDay());
     $("#today-weather").append(cityTitle);
-    var TempetureToNum = parseInt((response.main.temp * 9) / 5 - 459);
-    var cityTemperature = $("<p>").text("Tempeture: " + TempetureToNum + " °F");
+    var TemperatureToNum = parseInt((response.main.temp * 9) / 5 - 459);
+    var cityTemperature = $("<p>").text(
+      "Temperature: " + TemperatureToNum + " °F"
+    );
     $("#today-weather").append(cityTemperature);
     var cityWindSpeed = $("<p>").text(
       "Wind Speed: " + response.wind.speed + " MPH"
@@ -104,22 +104,21 @@ function getWeather(cityName) {
             "/" +
             (day < 10 ? "0" : "") +
             day;
-
           var fiveDayH4 = $("<h6>").text(dayOutput);
-          var imgElTag = $("<img>");
+          var imgTag = $("<img>");
           var conditions = resFiveDay.list[i].weather[0].main;
-          if (conditions === "cloudy") {
-            imgElTag.attr(
+          if (conditions === "Clouds") {
+            imgTag.attr(
               "src",
               "https://img.icons8.com/color/48/000000/cloud.png"
             );
-          } else if (conditions === "sunny") {
-            imgElTag.attr(
+          } else if (conditions === "Clear") {
+            imgTag.attr(
               "src",
               "https://img.icons8.com/color/48/000000/summer.png"
             );
-          } else if (conditions === "rainy") {
-            imgElTag.attr(
+          } else if (conditions === "Rain") {
+            imgTag.attr(
               "src",
               "https://img.icons8.com/color/48/000000/rain.png"
             );
@@ -127,12 +126,12 @@ function getWeather(cityName) {
 
           var pTemperatureK = resFiveDay.list[i].main.temp;
           console.log(conditions);
-          var TempetureToNum = parseInt((pTemperatureK * 9) / 5 - 459);
+          var TemperatureToNum = parseInt((pTemperatureK * 9) / 5 - 459);
           var pTemperature = $("<p>").text(
-            "Tempeture: " + TempetureToNum + " °F"
+            "Temperature: " + TemperatureToNum + " °F"
           );
           fiveDay.append(fiveDayH4);
-          fiveDay.append(imgElTag);
+          fiveDay.append(imgTag);
           fiveDay.append(pTemperature);
           $("#boxes").append(fiveDay);
           console.log(resFiveDay);
@@ -144,19 +143,17 @@ function getWeather(cityName) {
 }
 
 $("#add-city").on("click", function (event) {
-    event.preventDefault();
-  
-    var city = $("#city-input").val().trim();
-  
-    if (city === "") {
-      return;
-    }
-    cities.push(city);
-    storedCity();
-    showCity();
-  });
-  
-  $(document).on("click", "#listC", function () {
-    var thisCity = $(this).attr("data-city");
-    getWeather(thisCity);
-  });
+  event.preventDefault();
+  var city = $("#city-input").val().trim();
+  if (city === "") {
+    return;
+  }
+  cities.push(city);
+  saveCity();
+  showCity();
+});
+
+$(document).on("click", "#listC", function () {
+  var thisCity = $(this).attr("data-city");
+  getWeather(thisCity);
+});
